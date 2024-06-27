@@ -102,7 +102,7 @@ public class MoneyFlow {
         return paymentMethod;
     }
 
-    public void setPaymentMethod(String paymentMethod) {
+    public void setPaymentMethod(String paymentMethod) {g
         this.paymentMethod = paymentMethod;
     }
 }
