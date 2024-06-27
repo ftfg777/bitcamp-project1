@@ -14,4 +14,8 @@ public class Test1 {
             System.out.println("Hello");
         }
     }
+
+    static void m1(){
+        System.out.println("m1 메소드");
+    }
 }
