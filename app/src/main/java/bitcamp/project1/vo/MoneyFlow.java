@@ -1,18 +1,18 @@
 package bitcamp.project1.vo;
 
 import java.util.Date;
-import bitcamp.project1.vo.Category;
-import bitcamp.project1.vo.PaymentMethod;   // 임시 제목, 수정 요
 import java.util.Objects;
 
 public class MoneyFlow {
-    private int index;
-    private Date transactionDate;
-    private int amount;
-    private String incomeOrSpend;
-    private Category category;
-    private String note;
-    private PaymentMethod paymentMethod; // 임시 제목, 수정 요
+    private int index;                      // 인덱스
+    private Date transactionDate;           // 날짜
+    private int amount;                     // 금액
+    private String incomeOrSpend;           // 수입 지출 구분
+    private String category;                // 카테고리
+    private String note;                    // 설명
+    private Object paymentMethod;           // 결제수단
+
+
 
     @Override
     public boolean equals(Object o) {
@@ -39,7 +39,7 @@ public class MoneyFlow {
     }
 
     public MoneyFlow(int index, Date transactionDate, int amount, String incomeOrSpend,
-        Category category, String note, PaymentMethod paymentMethod) {
+        String category, String note, Object paymentMethod) {
         this.index = index;
         this.transactionDate = transactionDate;
         this.amount = amount;
@@ -81,11 +81,11 @@ public class MoneyFlow {
         this.incomeOrSpend = incomeOrSpend;
     }
 
-    public Category getCategory() {
+    public String getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(String category) {
         this.category = category;
     }
 
@@ -97,11 +97,11 @@ public class MoneyFlow {
         this.note = note;
     }
 
-    public PaymentMethod getPaymentMethod() {
+    public Object getPaymentMethod() {
         return paymentMethod;
     }
 
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
+    public void setPaymentMethod(Object paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
 }
