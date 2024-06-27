@@ -13,5 +13,7 @@ public class Test1 {
 
     static void m1(){
         System.out.println("m1 메소드");
+        Print print = new Print();
+        print.printHello();
     }
 }
