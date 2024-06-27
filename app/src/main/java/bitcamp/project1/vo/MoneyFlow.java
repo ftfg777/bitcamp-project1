@@ -4,13 +4,15 @@ import java.util.Date;
 import java.util.Objects;
 
 public class MoneyFlow {
-    private int index;
-    private Date transactionDate;
-    private int amount;
-    private String incomeOrSpend;
-    private String category;
-    private String note;
-    private String paymentMethod; // 임시 제목, 수정 필요
+    private int index;                      // 인덱스
+    private Date transactionDate;           // 날짜
+    private int amount;                     // 금액
+    private String incomeOrSpend;           // 수입 지출 구분
+    private String category;                // 카테고리
+    private String note;                    // 설명
+    private Object paymentMethod;           // 결제수단
+
+
 
     @Override
     public boolean equals(Object o) {
@@ -29,18 +31,15 @@ public class MoneyFlow {
         return Objects.hashCode(index);
     }
 
-    // empty MoneyFLow 생성자
     public MoneyFlow(){
     }
 
-    // index 값만 가진 MoneyFlow 생성자
     public MoneyFlow(int index){
         this.index = index;
     }
 
-    // 전체 값 갖는 MoneyFLow 생성자
     public MoneyFlow(int index, Date transactionDate, int amount, String incomeOrSpend,
-        String category, String note, String paymentMethod) {
+        String category, String note, Object paymentMethod) {
         this.index = index;
         this.transactionDate = transactionDate;
         this.amount = amount;
@@ -98,11 +97,11 @@ public class MoneyFlow {
         this.note = note;
     }
 
-    public String getPaymentMethod() {
+    public Object getPaymentMethod() {
         return paymentMethod;
     }
 
-    public void setPaymentMethod(String paymentMethod) {g
+    public void setPaymentMethod(Object paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
 }
