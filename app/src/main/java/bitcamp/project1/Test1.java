@@ -27,5 +27,14 @@ public class Test1 {
         System.out.println("m1 메소드");
         Print print = new Print();
         print.printHello();
+        System.out.println("m1 메소드드드드드드드드드");
+    }
+
+    static void m2() {
+        System.out.println("mbti : ENTP");
+    }
+
+    static void m3() {
+        System.out.println("mbti : INFP");
     }
 }
