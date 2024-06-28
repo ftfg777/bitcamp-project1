@@ -1,6 +1,5 @@
 package bitcamp.project1.command;
 
-
 import bitcamp.project1.util.LinkedList;
 
 public class MoneyFlowCommand {
