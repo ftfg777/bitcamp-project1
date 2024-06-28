@@ -1,11 +1,14 @@
 package bitcamp.project1.chanwoo.command;
 
 
-import bitcamp.project1.chanwoo.util.Prompt;
-import bitcamp.project1.chanwoo.vo.MoneyFlow;
+import bitcamp.project1.util.Prompt;
+import bitcamp.project1.vo.Category.DepositCategory;
+import bitcamp.project1.vo.Category.WithdrawCategory;
+import bitcamp.project1.vo.MoneyFlow;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
 
 public class MoneyFlowCommand {
@@ -35,8 +38,8 @@ public class MoneyFlowCommand {
         System.out.printf(moneyFlow.setDescription(Prompt.input("설명:")));
         System.out.printf(moneyFlow.setDescription(Prompt.input("설명:")));
         System.out.printf(moneyFlow.setDescription(Prompt.input("설명:")));
-
     }
+
 
     public void viewMoneyFlow() {
         System.out.println("번호 | 거래유형 | 날짜 | 카테고리 | 금액 | 메모");
@@ -55,6 +58,7 @@ public class MoneyFlowCommand {
 
 
     public void addMoneyFlow() {
+
         while (true) {
             try {
                 MoneyFlow moneyFlow = new MoneyFlow();

@@ -65,16 +65,16 @@ public class App {
         try {
             switch (menuTitle) {
                 case "작성":
-                    moneyFlowCommand.addMoneyFlow();
+                    moneyFlowCommand.executeCreate();
                     break;
                 case "조회":
-                    moneyFlowCommand.viewMoneyFlow();
+                    moneyFlowCommand.executeRead();
                     break;
                 case "수정":
-                    moneyFlowCommand.updateMoneyFlow();
+                    moneyFlowCommand.executeUpdate();
                     break;
                 case "삭제":
-                    moneyFlowCommand.deleteMoneyFlow();
+                    moneyFlowCommand.executeDelete();
                     break;
                 default:
                     System.out.printf("%s 메뉴의 명령을 처리할 수 없습니다.\n", menuTitle);
