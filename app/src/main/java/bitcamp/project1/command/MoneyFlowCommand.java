@@ -133,38 +133,61 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
 
     @Override
     public void executeUpdate() {
-//        executeRead(accountBook);
-//
-//        int index = Prompt.inputInt("수정 할 기록의 index : ");
-//
-//        MoneyFlow updateMF = (MoneyFlow) accountBook.get(index);
-//
-////        Date date =
-////            Prompt.inputDate("date 변경 (" + updateMF.getTransactionDate() + ") :");
-//        String incomeOrSpend =
-//            inputIncomeOrSpend("수입 or 지출 변경 (" + updateMF.getIncomeOrSpend() + ") : ");
-//        int amount =
-//            inputAmount("금액 변경 (" + updateMF.getAmount() + ") : ");
-//        String paymentMethod =
-//            inputPaymentMethod("결제 수단 변경 (" + updateMF.getPaymentMethod().toString() + ") :");
-//        String category =
-//            inputCategory(updateMF.getIncomeOrSpend(), "항목 변경 (" + updateMF.getCategory() + ") :");
-//        String note =
-//            inputNote("설명 변경 (" + updateMF.getDescription() + ") :");
-//
-////        MoneyFlow updatedMoneyFlow = new MoneyFlow(accountBook.size(), date, amount, incomeOrSpend,
-////            category,
-////            note, paymentMethod);
-////
-////        int addIndex = 0;
-////        for (addIndex = 0; addIndex < accountBook.size(); addIndex++) {
-////            MoneyFlow oldMoneyFlow = (MoneyFlow) accountBook.get(addIndex);
-////
-////            if (oldMoneyFlow.getTransactionDate().after(updatedMoneyFlow.getTransactionDate())) {
-////                break;
-////            }
-////        }
-////        accountBook.set(addIndex, updatedMoneyFlow);
+        executeRead();
+
+        // 예외 처리 필요할 거 같습니다!
+        while (true) {
+            int index = Prompt.inputInt("수정 할 기록의 INDEX : ");
+            if (index == 0) {
+                System.out.println("수정이 취소되었습니다.");
+                return;
+            }
+            MoneyFlow updateMF = moneyFlowList.get(index);
+            if (updateMF == null) {
+                System.out.println("해당 번호의 거래 내역이 없습니다.");
+                continue;
+            }
+
+            // 직접적인 날짜 수정은 막고 수정을 하고 싶으면 삭제하거나 새로 만드는 걸로 하는 게 어떨까 싶습니다!
+            int year = inputYearWithDefault("넣어주세용! 연도 :");
+            int month = inputMonthWithDefault("넣어주세용! 월 :");
+            Calendar calendar = printCalendar(year, month - 1);
+            inputDayWithDefault("넣어주세용! 일 :", calendar);
+
+            // 이 부분 가독성이
+            String incomeOrSpend =
+                inputIncomeOrSpend("수입 or 지출 변경 (" + updateMF.getIncomeOrSpend() + ") : ");
+            int amount =
+                inputAmount("금액 변경 (" + updateMF.getAmount() + ") : ");
+            String paymentMethod =
+                inputPaymentMethod("결제 수단 변경 (" + updateMF.getPaymentMethod().toString() + ") :");
+            String category =
+                inputCategory(updateMF.getIncomeOrSpend(),
+                    "항목 변경 (" + updateMF.getCategory() + ") :");
+            String note =
+                inputDescription("설명 변경 (" + updateMF.getDescription() + ") :");
+
+            // 생성자로 수정을 하면 기존 객체가 아닌 힙영역에 새롭게 생성되는 객체로 하시려는
+            // 의도가 맞는지 궁금합니다~!
+            MoneyFlow updatedMoneyFlow = new MoneyFlow(calendar, amount,
+                incomeOrSpend,
+                category,
+                note, paymentMethod);
+
+            int addIndex = 0;
+            for (addIndex = 0; addIndex < moneyFlowList.size(); addIndex++) {
+                MoneyFlow oldMoneyFlow = moneyFlowList.get(addIndex);
+
+                // 캘린더로 받으면서 .after를 사용할 수 없게 됨.
+                // 캘린더 -> Date 형변환 후 .after 메소드 사용
+                if (oldMoneyFlow.getCalendar().getTime()
+                    .after(updatedMoneyFlow.getCalendar().getTime())) {
+                    break;
+                }
+            }
+            moneyFlowList.set(addIndex, updatedMoneyFlow);
+        }
+
     }
 
     @Override
@@ -174,12 +197,12 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
 
     @Override
     public void executeDelete() {
-//        printAccountBook(accountBook);
-//
-//        int index = Prompt.inputInt("삭제 할 기록의 index : ");
-//
-//        accountBook.remove(index - 1);
-//
+        printAccountBook(moneyFlowList);
+
+        int index = Prompt.inputInt("삭제 할 기록의 index : ");
+
+        moneyFlowList.remove(index - 1);
+
     }
 
     public int processTransactionType(MoneyFlow moneyFlow) {
@@ -366,6 +389,99 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
         return day >= 1 && day <= maxDay;
     }
 
+    public static int inputAmount(String message) {
+        while (true) {
+            try {
+                int amount = Prompt.inputInt(message);
+                return amount;
+            } catch (NumberFormatException e) {
+                System.out.println("올바른 금액을 입력하세요.");
+            }
+        }
+    }
+
+    public static String inputIncomeOrSpend(String message) {
+        while (true) {
+            try {
+                System.out.println("1.   수입");
+                System.out.println("2.   지출");
+
+                int incomeOrSpend = Prompt.inputInt(message);
+
+                switch (incomeOrSpend) {
+                    case 1:
+                        return "수입";
+                    case 2:
+                        return "지출";
+                    default:
+                        System.out.println("올바른 항목을 선택해주세요.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("숫자로 입력해주세요.");
+            }
+        }
+    }
+
+    public static String inputCategory(String incomeOrSpend, String message) {
+        while (true) {
+            try {
+                if (incomeOrSpend.equals("수입")) {
+                    for (int i = 0; i < DepositCategory.values().length; i++) {
+                        System.out.println(i + 1 + ". " + DepositCategory.values()[i].getName());
+                    }
+
+                    int inputCategory = Prompt.inputInt(message);
+
+                    if (0 < inputCategory && inputCategory < DepositCategory.values().length + 1) {
+                        return DepositCategory.values()[inputCategory - 1].getName();
+                    } else {
+                        System.out.println("올바른 항목을 선택하세요. ");
+                    }
+                } else if (incomeOrSpend.equals("지출")) {
+                    for (int i = 0; i < WithdrawCategory.values().length; i++) {
+                        System.out.println(i + 1 + ". " + WithdrawCategory.values()[i].getName());
+                    }
+
+                    int inputCategory = Prompt.inputInt(message);
+
+                    if (0 < inputCategory && inputCategory < WithdrawCategory.values().length + 1) {
+                        return WithdrawCategory.values()[inputCategory - 1].getName();
+                    } else {
+                        System.out.println("올바른 항목을 선택하세요. ");
+                    }
+                } else {
+                    return null;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("숫자로 입력해주세요.");
+            }
+        }
+    }
+
+    public static String inputDescription(String message) {
+        return Prompt.input(message);
+    }
+
+
+    public static String inputPaymentMethod(String message) {
+        while (true) {
+            try {
+                for (int i = 0; i < PaymentMethod.values().length; i++) {
+                    System.out.println(i + 1 + ". " + PaymentMethod.values()[i].getName());
+                }
+                int inputPaymentMethod = Prompt.inputInt(message);
+
+                if (0 < inputPaymentMethod
+                    && inputPaymentMethod < PaymentMethod.values().length + 1) {
+                    return PaymentMethod.values()[inputPaymentMethod - 1].getName();
+                } else {
+                    System.out.println("올바른 항목을 선택하세요. ");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("숫자로 입력해주세요.");
+            }
+        }
+    }
 
 }
 
