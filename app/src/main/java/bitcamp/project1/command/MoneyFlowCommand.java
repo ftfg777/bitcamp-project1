@@ -1,8 +1,6 @@
 package bitcamp.project1.command;
 
 
-import bitcamp.project1.util.LinkedList;
-
 public class MoneyFlowCommand {
 
     LinkedList projectList = new LinkedList();
@@ -52,7 +50,6 @@ public class MoneyFlowCommand {
     private void viewProject() {
         System.out.println("조회");
     }
-
 
 
     private void updateProject() {

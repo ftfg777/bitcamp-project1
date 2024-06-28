@@ -2,9 +2,6 @@ package bitcamp.project1;
 
 import bitcamp.project1.command.MoneyFlowCommand;
 import bitcamp.project1.util.Prompt;
-import bitcamp.project1.vo.Category;
-import bitcamp.project1.vo.Category.DepositCategory;
-import bitcamp.project1.vo.Category.WithdrawCategory;
 
 public class App {
 
