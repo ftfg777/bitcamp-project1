@@ -11,6 +11,7 @@ public class Prompt {
     return keyboardScanner.nextLine();
   }
 
+
   public static int inputInt(String format, Object... args) {
     return Integer.parseInt(input(format, args));
   }

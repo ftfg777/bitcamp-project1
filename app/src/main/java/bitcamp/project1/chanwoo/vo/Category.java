@@ -1,4 +1,4 @@
-package bitcamp.project1.vo;
+package bitcamp.project1.chanwoo.vo;
 
 public class Category {
 
@@ -14,6 +14,7 @@ public class Category {
         DepositCategory(String name) {
             this.name = name;
         }
+
         // 문자열 값을 반환하는 메서드
         public String getName() {
             return name;
@@ -38,6 +39,7 @@ public class Category {
         WithdrawCategory(String name) {
             this.name = name;
         }
+
         // 문자열 값을 반환하는 메서드
         public String getName() {
             return name;

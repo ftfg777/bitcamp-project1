@@ -1,4 +1,4 @@
-package bitcamp.project1.vo;
+package bitcamp.project1.chanwoo.vo;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

@@ -1,4 +1,4 @@
-package bitcamp.project1.util;
+package bitcamp.project1.chanwoo.util;
 
 public class LinkedList extends AbstractList {
 
