@@ -18,6 +18,7 @@ public class MoneyFlow {
     private Object paymentMethod;                // 결제수단
 
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
