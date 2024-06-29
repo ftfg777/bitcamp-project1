@@ -2,6 +2,8 @@ package bitcamp.project1.chanwoo.command;
 
 
 import bitcamp.project1.chanwoo.util.Prompt;
+import bitcamp.project1.chanwoo.vo.Category.DepositCategory;
+import bitcamp.project1.chanwoo.vo.Category.WithdrawCategory;
 import bitcamp.project1.chanwoo.vo.MoneyFlow;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,10 +33,88 @@ public class MoneyFlowCommand {
         }
         int no = Prompt.inputInt("수정할 내역 선택:");
         MoneyFlow moneyFlow = moneyFlowList.get(no - 1);
+
+        System.out.println("date 변경 (");
+        // Date 입력 받는 로직 추가
+        // Calendar calendar = Calendar.~~
+        // ~~~
+
+        // Date 입력 받는 로직 추가
+        moneyFlow.setTransactionDate(inputCalendar(기존 값 () 수정 값 : );
         System.out.printf(moneyFlow.setDescription(Prompt.input("설명:")));
         System.out.printf(moneyFlow.setDescription(Prompt.input("설명:")));
         System.out.printf(moneyFlow.setDescription(Prompt.input("설명:")));
         System.out.printf(moneyFlow.setDescription(Prompt.input("설명:")));
+
+        try {
+            int incomeOrSpendNo = Prompt.inputInt("거래 유형(1.입금 2.지출 0.종료):");
+            if (incomeOrSpendNo == 0) {
+                System.out.println("입력을 종료합니다.");
+                return;
+            }
+            if (incomeOrSpendNo < 0 || incomeOrSpendNo >= 3) {
+                System.out.println("유효한 번호를 입력해 주세요.");
+                continue;
+            }
+
+            // 입금 로직
+            if (incomeOrSpendNo == 1) {
+                moneyFlow.setIncomeOrSpend("입금");
+
+                int depositAmount = Prompt.inputInt("입금액 입력:");
+                if (depositAmount <= 0) {
+                    System.out.println("0보다 큰 금액을 입력해 주세요.");
+                    continue;
+                }
+
+                moneyFlow.setAmount(moneyFlow.getAmount() + depositAmount);
+
+                int i = 0;
+                for (DepositCategory category : DepositCategory.values()) {
+                    System.out.printf("%d. %s\n", i + 1, category.getName());
+                    i++;
+                }
+                int categoryNo = Prompt.inputInt("카테고리 선택:");
+                if (!isInRange(categoryNo, 0, DepositCategory.values().length)) {
+                    System.out.println("유효한 카테고리 번호를 입력해 주세요.");
+                    continue;
+                }
+                moneyFlow.setCategory(DepositCategory.values()[categoryNo - 1].getName());
+            }
+
+            // 지출 로직
+            if (incomeOrSpendNo == 2) {
+                moneyFlow.setIncomeOrSpend("지출");
+                int amountSpent = Prompt.inputInt("지출액 입력:");
+                if (amountSpent <= 0) {
+                    System.out.println("0보다 큰 금액을 입력해 주세요.");
+                    continue;
+                }
+
+                moneyFlow.setAmount(moneyFlow.getAmount() - amountSpent);
+
+                int i = 0;
+                for (WithdrawCategory category : WithdrawCategory.values()) {
+                    System.out.printf("%d. %s\n", i + 1, category.getName());
+                    i++;
+                }
+
+                int categoryNo = Prompt.inputInt("카테고리 선택:");
+                if (!isInRange(categoryNo, 0, WithdrawCategory.values().length)) {
+                    System.out.println("유효한 카테고리 번호를 입력해 주세요.");
+                    continue;
+                }
+                moneyFlow.setCategory(WithdrawCategory.values()[categoryNo - 1].getName());
+            }
+
+            moneyFlow.setDescription(Prompt.input("메모 입력:"));
+            moneyFlow.setNo(MoneyFlow.getNextSeqNo());
+            moneyFlowList.add(moneyFlow);
+            System.out.println("작성 완료");
+
+        } catch (NumberFormatException e) {
+            System.out.println("유효한 값이 아닙니다.");
+        }
 
     }
 
@@ -243,6 +323,33 @@ public class MoneyFlowCommand {
         calendar.set(year, month, 1);
         int maxDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
         return day >= 1 && day <= maxDay;
+    }
+
+    public static void printAccountBook(ArrayList moneyFlowList) {
+        System.out.println(Title);
+        System.out.println(
+            "No |   날짜   |     수입     |     지출     |     잔액     |   항목   | 결제방식 |     note");
+        System.out.println(
+            "-------------------------------------------------------------------------------------------------------------");
+        int balance = 0;
+
+        for (int i = 0; i < moneyFlowList.size(); i++) {
+            MoneyFlow mf = (MoneyFlow) moneyFlowList.get(i);
+
+            int income = 0;
+            int spend = 0;
+            if (mf.getIncomeOrSpend().equals("수입")) {
+                income = mf.getAmount();
+                balance += income;
+            } else {
+                spend = mf.getAmount();
+                balance -= spend;
+            }
+
+            System.out.printf("%02d |%s| %,12d | %,12d | %,12d | %s | %s | %s\n", mf.getNo(),
+                mf.getTransactionDateByString(), income, spend, balance, mf.getCategory(),
+                mf.getPaymentMethod().toString(), mf.getNote());
+        }
     }
 }
 

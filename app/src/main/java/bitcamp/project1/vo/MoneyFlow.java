@@ -125,6 +125,12 @@ public class MoneyFlow {
         return description;
     }
 
+
+    public void inputCalendar("~~~~~") {
+        Calendar calendar = ~~~;
+
+        setTransactionDate(calendar);
+    }
     public Object getPaymentMethod() {
         return paymentMethod;
     }
