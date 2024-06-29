@@ -88,6 +88,10 @@ public class MoneyFlow {
         return dateFormat.format(date);
     }
 
+    public Calendar getCalendar() {
+        return transactionDate;
+    }
+
     public void setTransactionDate(Calendar transactionDate) {
         this.transactionDate = transactionDate;
     }

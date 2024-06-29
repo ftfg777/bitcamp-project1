@@ -1,7 +1,7 @@
-package bitcamp.project1;
+package bitcamp.project1.chanwoo;
 
-import bitcamp.project1.command.MoneyFlowCommand;
-import bitcamp.project1.util.Prompt;
+import bitcamp.project1.chanwoo.command.MoneyFlowCommand;
+import bitcamp.project1.chanwoo.util.Prompt;
 
 public class App {
 
@@ -65,16 +65,16 @@ public class App {
         try {
             switch (menuTitle) {
                 case "작성":
-                    moneyFlowCommand.executeCreate();
+                    moneyFlowCommand.addMoneyFlow();
                     break;
                 case "조회":
-                    moneyFlowCommand.executeRead();
+                    moneyFlowCommand.viewMoneyFlow();
                     break;
                 case "수정":
-                    moneyFlowCommand.executeUpdate();
+                    moneyFlowCommand.updateMoneyFlow();
                     break;
                 case "삭제":
-                    moneyFlowCommand.executeDelete();
+                    moneyFlowCommand.deleteMoneyFlow();
                     break;
                 default:
                     System.out.printf("%s 메뉴의 명령을 처리할 수 없습니다.\n", menuTitle);
