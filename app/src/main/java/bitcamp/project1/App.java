@@ -1,12 +1,11 @@
 package bitcamp.project1;
 
 import bitcamp.project1.command.MoneyFlowCommand;
+import bitcamp.project1.util.Print;
 import bitcamp.project1.util.Prompt;
 
 public class App {
 
-    static String stars = "**********************************";
-    static String title = "**  쌈뽕 가계부: 재테크의 맛!  **";
     static String[] menus = new String[]{"작성", "조회", "수정", "삭제", "종료"};
 
     MoneyFlowCommand moneyFlowCommand = new MoneyFlowCommand();
@@ -15,16 +14,10 @@ public class App {
         new App().execute();
     }
 
-    public static void printTitle() {
-        System.out.println(stars);
-        System.out.println(title);
-        System.out.println(stars);
-    }
-
 
     void execute() {
-        printTitle();
-        printMenu();
+        Print.printTitleShort();
+        Print.printMenu("메인 메뉴", menus);
 
         String command;
         while (true) {
@@ -32,7 +25,7 @@ public class App {
                 command = Prompt.input("메인 >>");
                 System.out.println("");
                 if (command.equals("menu")) {
-                    printMenu();
+                    Print.printMenu("메인 메뉴", menus);
                 } else {
                     int menuNo = Integer.parseInt(command);
                     String menuTitle = getMenuTitle(menuNo, menus); // 설명하는 변수
@@ -53,24 +46,6 @@ public class App {
         Prompt.close();
 
     }
-
-
-    private void printMenu() {
-        System.out.println("--------<<  메인 메뉴  >>--------");
-        for (int i = 0; i < menus.length; i++) {
-            String menu = menus[i];
-            System.out.printf("%d. %s\n", i + 1, menu);
-        }
-    }
-
-    boolean isValidateMenu(int menuNo, String[] menus) {
-        return menuNo >= 1 && menuNo <= menus.length;
-    }
-
-    String getMenuTitle(int menuNo, String[] menus) {
-        return isValidateMenu(menuNo, menus) ? menus[menuNo - 1] : null;
-    }
-
 
     void processMenu(String menuTitle) {
         try {
@@ -94,6 +69,14 @@ public class App {
             System.out.println("숫자로 메뉴 번호를 입력하세요.");
         }
 
+    }
+
+    boolean isValidateMenu(int menuNo, String[] menus) {
+        return menuNo >= 1 && menuNo <= menus.length;
+    }
+
+    String getMenuTitle(int menuNo, String[] menus) {
+        return isValidateMenu(menuNo, menus) ? menus[menuNo - 1] : null;
     }
 
 

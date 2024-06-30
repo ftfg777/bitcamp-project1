@@ -1,6 +1,5 @@
 package bitcamp.project1.util;
 
-import bitcamp.project1.App;
 import bitcamp.project1.vo.Category.DepositCategory;
 import bitcamp.project1.vo.Category.WithdrawCategory;
 import bitcamp.project1.vo.MoneyFlow;
@@ -10,6 +9,9 @@ import java.util.List;
 
 public class Print {
 
+    static String stars = "**************************************";
+    static String title = "**  쌈뽕 가계부 : 재테크의 매운맛!  **";
+
     public static Calendar printCalendar(int year, int month) {
         // 현재 연도와 월 가져오기
         String boldAnsi = "\033[1m";
@@ -18,7 +20,7 @@ public class Print {
         LocalDate today = LocalDate.now();
 
         Calendar calendar = Calendar.getInstance();
-        System.out.println("--------------------------------------");
+        System.out.println("---------------------");
 
         // 해당 월의 첫 번째 날로 설정
         calendar.set(year, month, 1);
@@ -59,17 +61,17 @@ public class Print {
         if (dayOfWeekCounter != 0) {
             System.out.println();
         }
-        System.out.println("--------------------------------------");
+        System.out.println("---------------------");
         return calendar;
     }
 
     public static void printAccountBook(List<MoneyFlow> moneyFlowList) {
-        App.printTitle();
+        printTitleLong();
 
         System.out.println(
-            "No |   날짜   |     수입     |     지출     |     잔액     |   항목   | 결제방식 |     메모");
+            "No |   날짜   |      수입      |      지출      |      잔액      |   항목   | 결제방식 |       메모");
         System.out.println(
-            "-------------------------------------------------------------------------------------------------------------");
+            "------------------------------------------------------------------------------------------------------------------");
         int balance = 0;
 
         for (int i = 0; i < moneyFlowList.size(); i++) {
@@ -85,14 +87,16 @@ public class Print {
                 balance += spend;
             }
 
-            System.out.printf("%02d |%s| %,12d | %,12d | %,12d | %s | %s | %s\n", mf.getNo(),
+            System.out.printf("%02d |%s| %,14d | %,14d | %,14d | %s | %s | %s\n", mf.getNo(),
                 mf.getTransactionDate(), income, spend, balance, mf.getCategory(),
                 mf.getPaymentMethod(), mf.getDescription());
         }
+        System.out.println("");
     }
 
     public static void printCategory(Object value) {
         int i = 0;
+        System.out.println("------<< 카테고리 [0 : 종료] >>------");
 
         if (value instanceof DepositCategory) {
             for (DepositCategory category : DepositCategory.values()) {
@@ -106,5 +110,33 @@ public class Print {
                 i++;
             }
         }
+    }
+
+    public static void printMenu(String menuTitle, String[] menus) {
+        System.out.println("----------<<  " + menuTitle + "  >>----------");
+        for (int i = 0; i < menus.length; i++) {
+            String menu = menus[i];
+            System.out.printf("%d. %s\n", i + 1, menu);
+        }
+    }
+
+    public static void printMenuWithExit(String menuTitle, String[] menus) {
+        System.out.println("--------<<  " + menuTitle + " [0 = 종료]  >>--------");
+        for (int i = 0; i < menus.length; i++) {
+            String menu = menus[i];
+            System.out.printf("%d. %s\n", i + 1, menu);
+        }
+    }
+
+    public static void printTitleShort() {
+        System.out.println(stars);
+        System.out.println(title);
+        System.out.println(stars);
+    }
+
+    public static void printTitleLong() {
+        System.out.println(stars + stars + stars);
+        System.out.println(stars + title + stars);
+        System.out.println(stars + stars + stars);
     }
 }
