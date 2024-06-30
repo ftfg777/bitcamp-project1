@@ -326,7 +326,6 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
     }
 
     public Calendar printCalendar(int year, int month) {
-        // 현재 연도와 월 가져오기
         String boldAnsi = "\033[1m";
         String redAnsi = "\033[31m";
         String resetAnsi = "\033[0m";
