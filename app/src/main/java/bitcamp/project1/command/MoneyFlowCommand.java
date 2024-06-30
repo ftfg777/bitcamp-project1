@@ -8,7 +8,6 @@ import bitcamp.project1.util.PromptMoneyFlow;
 import bitcamp.project1.vo.Category.DepositCategory;
 import bitcamp.project1.vo.Category.WithdrawCategory;
 import bitcamp.project1.vo.MoneyFlow;
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,21 +24,26 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
             try {
                 MoneyFlow moneyFlow = new MoneyFlow();
 
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // 읽은 후 삭제 혹은 답변 부탁드릴게요!
+                // 변경된 로직 (240629 by 동인) 컨펌 후 주석 제거
+                // 여기부터 Calendar inputCalendar() 로 바꿔도 될 듯 해서 메서드화 했습니다!
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 Calendar calendar = PromptMoneyFlow.inputCalendar(Calendar.getInstance());
-                if (calendar == null) {
-                    break;
-                } else {
-                    moneyFlow.setTransactionDate(calendar);
-                }
+                if (calendar == null) break;
+                else moneyFlow.setTransactionDate(calendar);
+
 
                 int result = processTransactionType(moneyFlow); // 수입 | 지출 선택
-                if (result == 0) {
-                    break;
-                }
+                if (result == 0) break;
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // 읽은 후 삭제 혹은 답변 부탁드릴게요!
+                // 각 입력들마다 종료를 위한 반환값을 주거나, 내부에서 탈출할 수 있게
+                // 모든 입력 탈출부분을 통일하고싶어요! 이건 같이 생각해봐요 ㅎㅎ
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
                 // 메모 입력 및 세팅
-                String description = PromptMoneyFlow.inputTransactionDescription("메모 입력 >>",
-                    moneyFlow); // 메모 입력
+                String description = PromptMoneyFlow.inputTransactionDescription("메모 입력 >>", moneyFlow); // 메모 입력
                 moneyFlow.setDescription(description);
 
                 // static seqNo 증가 후 리스트 추가
@@ -61,53 +65,92 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
     public void executeUpdate() {
         Print.printAccountBook(moneyFlowList);
 
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // 읽은 후 삭제 혹은 답변 부탁드릴게요!
+        // (0) 예외 처리 필요할 거 같습니다!
+        //
+        // -> 혹시 이건 throw 되는 error에 대한 대응 말씀하시는 걸까요?
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         while (true) {
+            MoneyFlow newMoneyFlow = new MoneyFlow();
+
             int no = Prompt.inputInt("수정 할 기록의 No [0 = 종료] >>");
-            if (no == 0) {
-                break;
-            }
+            if (no == 0) break;
 
             // 선택한 No의 MoneyFlow 선택
-            MoneyFlow updateMF = getByNo(no);
-            int updateIndex = ofIndex((ArrayList) moneyFlowList, updateMF);
-            if (updateIndex == 1) {
+            MoneyFlow updateMoneyFlow = getByNo(no);
+
+            // 선택한 No를 가진 MoneyFLow의 index
+            int updateIndex = ofIndex((ArrayList) moneyFlowList, updateMoneyFlow);
+
+            if (updateIndex == -1) {
                 System.out.println("error accured...");
             }
-
-            if (updateMF == null) {
+            if (updateMoneyFlow == null) {
                 System.out.println("해당 번호의 거래 내역이 없습니다.");
                 continue;
             }
 
-            Calendar calendar = PromptMoneyFlow.inputCalendar(updateMF.getCalendar());
-            if (calendar == null) {
-                break;
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // 읽은 후 삭제 혹은 답변 부탁드릴게요!
+            // (1) 직접적인 날짜 수정은 막고 수정을 하고 싶으면 삭제하거나 새로 만드는 걸로 하는 게
+            // 어떨까 싶습니다!
+            //
+            // -> 3번 주석 답변처럼, 생성자를 사용해 아예 새로운 객체를 생성하는 방식을 사용할
+            // 예정이라 삭제 및 새로 만들기 개념이 될 것 같습니다!
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            Calendar calendar = PromptMoneyFlow.inputCalendar(updateMoneyFlow.getCalendar());
+            if (calendar == null) break;
+            else newMoneyFlow.setTransactionDate(calendar);
+
+
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // 읽은 후 삭제 혹은 답변 부탁드릴게요!
+            // (2) 이 부분 가독성이
+            //
+            //  -> 깰꼼하게 바꿔놓을게요! ㅋㅋㅋㅋ
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            String inputIncomeOrSpendMessage = "수입 or 지출 변경 (" + updateMoneyFlow.getIncomeOrSpend() + ") >>";
+            String incomeOrSpend = PromptMoneyFlow.inputIncomeOrSpend(inputIncomeOrSpendMessage);
+            newMoneyFlow.setIncomeOrSpend(incomeOrSpend);
+
+            String inputAmountMessage = "금액 변경 (" + updateMoneyFlow.getAmount() + ") >>";
+            int amount = PromptMoneyFlow.inputAmount(inputAmountMessage, newMoneyFlow.getIncomeOrSpend());
+            newMoneyFlow.setAmount(amount);
+
+            if (newMoneyFlow.getIncomeOrSpend().equals("지출")) {
+                String inputPaymentMethodMessage = "결제 수단 변경 (" + updateMoneyFlow.getPaymentMethod().toString() + ") >>";
+                String paymentMethod = PromptMoneyFlow.inputPaymentMethod(inputPaymentMethodMessage);
+                newMoneyFlow.setPaymentMethod(paymentMethod);
+            }
+            else if (newMoneyFlow.getIncomeOrSpend().equals("수입")){
+                newMoneyFlow.setPaymentMethod("        ");
             }
 
-            String inputIncomeOrSpendMessage =
-                "수입 or 지출 변경 (" + updateMF.getIncomeOrSpend() + ") >>";
-            String incomeOrSpend = PromptMoneyFlow.inputIncomeOrSpend(inputIncomeOrSpendMessage);
+            String inputCategoryMessage = "항목 변경 (" + updateMoneyFlow.getCategory() + ") >>";
+            String category = PromptMoneyFlow.inputCategory(newMoneyFlow.getIncomeOrSpend(), inputCategoryMessage);
+            newMoneyFlow.setCategory(category);
 
-            String inputAmountMessage = "금액 변경 (" + updateMF.getAmount() + ") >>";
-            int amount = PromptMoneyFlow.inputAmount(inputAmountMessage);
-
-            String inputPaymentMethodMessage =
-                "결제 수단 변경 (" + updateMF.getPaymentMethod().toString() + ") >>";
-            String paymentMethod = PromptMoneyFlow.inputPaymentMethod(inputPaymentMethodMessage);
-
-            String inputCategoryMessage = "항목 변경 (" + updateMF.getCategory() + ") >>";
-            String category = PromptMoneyFlow.inputCategory(updateMF.getIncomeOrSpend(),
-                inputCategoryMessage);
-
-            String inputDescriptionMessage = "설명 변경 (" + updateMF.getDescription() + ") >>";
+            String inputDescriptionMessage = "설명 변경 (" + updateMoneyFlow.getDescription() + ") >>";
             String description = PromptMoneyFlow.inputDescription(inputDescriptionMessage);
+            newMoneyFlow.setDescription(description);
 
-            MoneyFlow updatedMoneyFlow = new MoneyFlow(calendar, amount,
-                incomeOrSpend, category, description, paymentMethod);
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // 읽은 후 삭제 혹은 답변 부탁드릴게요!
+            // (3) 생성자로 수정을 하면 기존 객체가 아닌 힙영역에 새롭게 생성되는 객체로 하시려는
+            // 의도가 맞는지 궁금합니다~!
+            //
+            //  -> 넵 맞습니다. 그런 방식을 채택하고 있긴 했는데, 혹시나 setter로 수정하는 방식을
+            //  원하시면 바꿀 순 있습니다. 다만, 다른 입력은 setter로 변경하고
+            //  날짜 입력은 삭제 및 새로 만드는 방식을 채택하게 된다면 날짜 변경 시에는
+            //  1. 유저가 직접 삭제 후 새로 만들기 (no가 바뀌는 문제가 있음)
+            //  2. 생성자를 사용해 삭제와 새로 만들기를 코드 내에서 진행 (기존 방식과 크게 달라질 점이 없음)
+            //  이런 문제가 예상되어서 그런 문제가 상관 없다면 바꿀 수 있습니다.
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-            updatedMoneyFlow.setNo(moneyFlowList.get(updateIndex).getNo());
+            newMoneyFlow.setNo(((MoneyFlow)moneyFlowList.get(updateIndex)).getNo());
 
-            moneyFlowList.set(updateIndex, updatedMoneyFlow);
+            moneyFlowList.set(updateIndex, newMoneyFlow);
 
             moneyFlowList = sortNoByDate((ArrayList) moneyFlowList);
             return;
@@ -117,7 +160,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
 
     private int ofIndex(ArrayList arrayList, MoneyFlow moneyFlow) {
         for (int i = 0; i < arrayList.size(); i++) {
-            if (moneyFlow.equals(arrayList.get(i))) {
+            if(moneyFlow.equals(arrayList.get(i))){
                 return i;
             }
         }
@@ -143,6 +186,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                 }
             }
         }
+
         return moneyFlowList;
     }
 
@@ -166,7 +210,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
         return moneyFlow;
     }
 
-    public MoneyFlow getByNo(int no) {
+    public MoneyFlow getByNo(int no){
         for (int i = 0; i < moneyFlowList.size(); i++) {
             if (moneyFlowList.get(i).getNo() == no) {
                 return moneyFlowList.get(i);
@@ -178,16 +222,21 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
     public int processTransactionType(MoneyFlow moneyFlow) {
         while (true) {
             try {
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // 읽은 후 삭제 혹은 답변 부탁드릴게요!
+                // incomeOrSpend를 String 반환형의 inputIncomeOrSpend로 변경하였고
+                // 값을 받은 뒤에 set 했습니다.
+                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 String incomeOrSpend = PromptMoneyFlow.inputIncomeOrSpend("거래 유형 선택 >>");
-                if (incomeOrSpend.equals("종료")) {
-                    return 0;
-                } else {
-                    moneyFlow.setIncomeOrSpend(incomeOrSpend);
-                }
+                if (incomeOrSpend.equals("종료")) return 0;
+                else moneyFlow.setIncomeOrSpend(incomeOrSpend);
+
 
                 // 수입 로직
                 if (moneyFlow.getIncomeOrSpend().equals("수입")) {
 
+                    // ************************
+                    // start of setting amount
                     int depositAmount = Prompt.inputInt("수입액 입력 >>");
                     if (depositAmount <= 0) {
                         System.out.println("0보다 큰 금액을 입력해 주세요.");
@@ -195,13 +244,16 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                     }
 
                     moneyFlow.setAmount(moneyFlow.getAmount() + depositAmount);
+                    // end of setting amount
+                    // ************************
 
+                    // ************************
+                    // start of setting category
                     Print.printCategory(DepositCategory.values()[0]);
                     int categoryNo = 0;
                     while (true) {
                         categoryNo = Prompt.inputInt("카테고리 선택 >>");
-                        if (!PromptMoneyFlow.isInRange(categoryNo, 0,
-                            DepositCategory.values().length)) {
+                        if (!PromptMoneyFlow.isInRange(categoryNo, 0, DepositCategory.values().length)) {
                             System.out.println("유효한 카테고리 번호를 입력해 주세요.");
                             continue;
                         }
@@ -209,7 +261,10 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                     }
 
                     moneyFlow.setCategory(DepositCategory.values()[categoryNo - 1].getName());
+                    // end of setting category
+                    // ************************
 
+                    // set paymentMethod to "          " because its income
                     moneyFlow.setPaymentMethod("        ");
                 }
 
@@ -224,20 +279,26 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                     }
 
                     moneyFlow.setAmount(moneyFlow.getAmount() - amountSpent);
+                    // end of setting amount
+                    // ************************
 
+                    // ************************
+                    // start of setting category
                     Print.printCategory(WithdrawCategory.values()[0]);
                     int categoryNo = 0;
                     while (true) {
                         categoryNo = Prompt.inputInt("카테고리 선택:");
-                        if (!PromptMoneyFlow.isInRange(categoryNo, 0,
-                            WithdrawCategory.values().length)) {
+                        if (!PromptMoneyFlow.isInRange(categoryNo, 0, WithdrawCategory.values().length)) {
                             System.out.println("유효한 카테고리 번호를 입력해 주세요.");
                             continue;
                         }
                         break;
                     }
                     moneyFlow.setCategory(WithdrawCategory.values()[categoryNo - 1].getName());
+                    // end of setting category
+                    // ************************
 
+                    // set paymentMethod by user's select because its spend
                     moneyFlow.setPaymentMethod(PromptMoneyFlow.inputPaymentMethod("결제 수단 >>"));
                 }
                 return 1;
@@ -249,139 +310,17 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
     }
 
 
-    public void printCategory(Object value) {
-        int i = 0;
-
-        if (value instanceof DepositCategory) {
-            for (DepositCategory category : DepositCategory.values()) {
-                System.out.printf("%d. %s\n", i + 1, category.getName());
-                i++;
-            }
-        }
-        if (value instanceof WithdrawCategory) {
-            for (WithdrawCategory category : WithdrawCategory.values()) {
-                System.out.printf("%d. %s\n", i + 1, category.getName());
-                i++;
-            }
-        }
-    }
-
-    public void printAccountBook(List<MoneyFlow> moneyFlowList) {
-        String title = "-----reach to rich-----";
-
-        System.out.println(title);
-        System.out.println(
-            "No |   날짜   |     수입     |     지출     |     잔액     |   항목   | 결제방식 |     메모");
-        System.out.println(
-            "-------------------------------------------------------------------------------------------------------------");
-        int balance = 0;
-
-        for (int i = 0; i < moneyFlowList.size(); i++) {
-            MoneyFlow mf = moneyFlowList.get(i);
-
-            int income = 0;
-            int spend = 0;
-            if (mf.getIncomeOrSpend().equals("수입")) {
-                income = mf.getAmount();
-                balance += income;
-            } else {
-                spend = mf.getAmount();
-                balance -= spend;
-            }
-
-            System.out.printf("%02d |%s| %,12d | %,12d | %,12d | %s | %s | %s\n", mf.getNo(),
-                mf.getTransactionDate(), income, spend, balance, mf.getCategory(),
-                "신용카드", mf.getDescription());
-        }
-    }
-
-    public Calendar printCalendar(int year, int month) {
-        // 현재 연도와 월 가져오기
-        String boldAnsi = "\033[1m";
-        String redAnsi = "\033[31m";
-        String resetAnsi = "\033[0m";
-        LocalDate today = LocalDate.now();
-
-        Calendar calendar = Calendar.getInstance();
-        System.out.println("--------------------------------------");
-
-        // 해당 월의 첫 번째 날로 설정
-        calendar.set(year, month, 1);
-
-        // 해당 월의 마지막 일 가져오기
-        int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-
-        // 달력 출력
-        System.out.printf("%s%d년 %d월%s \n", boldAnsi, year, (month + 1), resetAnsi);
-        System.out.println("일 월 화 수 목 금 토");
-
-        // 해당 월의 첫 번째 날의 요일을 가져오기
-        int firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-
-        // 달력 출력용 변수 설정
-        int dayOfWeekCounter = firstDayOfWeek - 1; // Adjust to zero-based index
-
-        // 첫 번째 주 앞쪽 공백 출력
-        for (int i = 0; i < dayOfWeekCounter; i++) {
-            System.out.print("   ");
-        }
-
-        // 달력 일 출력
-        for (int day = 1; day <= daysInMonth; day++) {
-            dayOfWeekCounter++;
-            if (today.getDayOfMonth() == day && today.getMonthValue() == month + 1
-                && today.getYear() == year) {
-                System.out.printf("%s%2d%s ", (boldAnsi + redAnsi), day, resetAnsi);
-            } else {
-                System.out.printf("%2d ", day);
-            }
-            if (dayOfWeekCounter == 7) {
-                dayOfWeekCounter = 0;
-                System.out.println();
-            }
-        }
-        // 마지막 주 줄바꿈
-        if (dayOfWeekCounter != 0) {
-            System.out.println();
-        }
-        System.out.println("--------------------------------------");
-        return calendar;
-    }
-
-    public static boolean isInRange(int value, int min, int max) {
-        return value > min && value <= max; // 월은 0부터 11까지 유효 (0: 1월, 11: 12월)
-    }
-
-    public static boolean isValidDay(int year, int month, int day) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, 1);
-        int maxDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
-        return day >= 1 && day <= maxDay;
-    }
-
-    public static int inputAmount(String message) {
-        while (true) {
-            try {
-                int amount = Prompt.inputInt(message);
-                return amount;
-            } catch (NumberFormatException e) {
-                System.out.println("올바른 금액을 입력하세요.");
-            }
-        }
-    }
-
-    public static String inputIncomeOrSpend(String message) {
-        while (true) {
-            try {
-                System.out.println("1.   수입");
-                System.out.println("2.   지출");
 
 
-            } catch (Exception e) {
 
-            }
-        }
-    }
+
+
+
+
+
+
+
+
 }
 
 
