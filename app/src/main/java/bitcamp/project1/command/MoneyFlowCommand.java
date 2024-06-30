@@ -25,11 +25,6 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
             try {
                 MoneyFlow moneyFlow = new MoneyFlow();
 
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                // 읽은 후 삭제 혹은 답변 부탁드릴게요!
-                // 변경된 로직 (240629 by 동인) 컨펌 후 주석 제거
-                // 여기부터 Calendar inputCalendar() 로 바꿔도 될 듯 해서 메서드화 했습니다!
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 Calendar calendar = PromptMoneyFlow.inputCalendar(Calendar.getInstance());
                 if (calendar == null) {
                     break;
@@ -41,11 +36,6 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                 if (result == 0) {
                     break;
                 }
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                // 읽은 후 삭제 혹은 답변 부탁드릴게요!
-                // 각 입력들마다 종료를 위한 반환값을 주거나, 내부에서 탈출할 수 있게
-                // 모든 입력 탈출부분을 통일하고싶어요! 이건 같이 생각해봐요 ㅎㅎ
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
                 // 메모 입력 및 세팅
                 String description = PromptMoneyFlow.inputTransactionDescription("메모 입력 >>",
@@ -71,12 +61,6 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
     public void executeUpdate() {
         Print.printAccountBook(moneyFlowList);
 
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // 읽은 후 삭제 혹은 답변 부탁드릴게요!
-        // (0) 예외 처리 필요할 거 같습니다!
-        //
-        // -> 혹시 이건 throw 되는 error에 대한 대응 말씀하시는 걸까요?
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         while (true) {
             int no = Prompt.inputInt("수정 할 기록의 No [0 = 종료] >>");
             if (no == 0) {
@@ -121,7 +105,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
             MoneyFlow updatedMoneyFlow = new MoneyFlow(calendar, amount,
                 incomeOrSpend, category, description, paymentMethod);
 
-            updatedMoneyFlow.setNo(((MoneyFlow)moneyFlowList.get(updateIndex)).getNo());
+            updatedMoneyFlow.setNo(moneyFlowList.get(updateIndex).getNo());
 
             moneyFlowList.set(updateIndex, updatedMoneyFlow);
 
@@ -194,21 +178,15 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
     public int processTransactionType(MoneyFlow moneyFlow) {
         while (true) {
             try {
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                // 읽은 후 삭제 혹은 답변 부탁드릴게요!
-                // incomeOrSpend를 String 반환형의 inputIncomeOrSpend로 변경하였고
-                // 값을 받은 뒤에 set 했습니다.
-                // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 String incomeOrSpend = PromptMoneyFlow.inputIncomeOrSpend("거래 유형 선택 >>");
-                if (incomeOrSpend.equals("종료")) return 0;
-                else moneyFlow.setIncomeOrSpend(incomeOrSpend);
-
+                if (incomeOrSpend.equals("종료")) {
+                    return 0;
+                } else {
+                    moneyFlow.setIncomeOrSpend(incomeOrSpend);
+                }
 
                 // 수입 로직
                 if (moneyFlow.getIncomeOrSpend().equals("수입")) {
-
-                    // ************************
-                    // start of setting amount
 
                     int depositAmount = Prompt.inputInt("수입액 입력 >>");
                     if (depositAmount <= 0) {
@@ -217,11 +195,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                     }
 
                     moneyFlow.setAmount(moneyFlow.getAmount() + depositAmount);
-                    // end of setting amount
-                    // ************************
 
-                    // ************************
-                    // start of setting category
                     Print.printCategory(DepositCategory.values()[0]);
                     int categoryNo = 0;
                     while (true) {
@@ -235,10 +209,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                     }
 
                     moneyFlow.setCategory(DepositCategory.values()[categoryNo - 1].getName());
-                    // end of setting category
-                    // ************************
 
-                    // set paymentMethod to "          " because its income
                     moneyFlow.setPaymentMethod("        ");
                 }
 
@@ -253,11 +224,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                     }
 
                     moneyFlow.setAmount(moneyFlow.getAmount() - amountSpent);
-                    // end of setting amount
-                    // ************************
 
-                    // ************************
-                    // start of setting category
                     Print.printCategory(WithdrawCategory.values()[0]);
                     int categoryNo = 0;
                     while (true) {
@@ -270,10 +237,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                         break;
                     }
                     moneyFlow.setCategory(WithdrawCategory.values()[categoryNo - 1].getName());
-                    // end of setting category
-                    // ************************
 
-                    // set paymentMethod by user's select because its spend
                     moneyFlow.setPaymentMethod(PromptMoneyFlow.inputPaymentMethod("결제 수단 >>"));
                 }
                 return 1;
