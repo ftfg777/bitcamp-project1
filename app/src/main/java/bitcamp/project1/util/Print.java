@@ -82,7 +82,7 @@ public class Print {
                 balance += income;
             } else {
                 spend = mf.getAmount();
-                balance -= spend;
+                balance += spend;
             }
 
             System.out.printf("%02d |%s| %,12d | %,12d | %,12d | %s | %s | %s\n", mf.getNo(),

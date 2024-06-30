@@ -8,7 +8,6 @@ import bitcamp.project1.util.PromptMoneyFlow;
 import bitcamp.project1.vo.Category.DepositCategory;
 import bitcamp.project1.vo.Category.WithdrawCategory;
 import bitcamp.project1.vo.MoneyFlow;
-import java.util.Comparator;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -73,17 +72,21 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
         // -> 혹시 이건 throw 되는 error에 대한 대응 말씀하시는 걸까요?
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         while (true) {
+            MoneyFlow newMoneyFlow = new MoneyFlow();
+
             int no = Prompt.inputInt("수정 할 기록의 No [0 = 종료] >>");
             if (no == 0) break;
 
             // 선택한 No의 MoneyFlow 선택
-            MoneyFlow updateMF = getByNo(no);
-            int updateIndex = ofIndex((ArrayList) moneyFlowList, updateMF);
-            if (updateIndex == 1) {
+            MoneyFlow updateMoneyFlow = getByNo(no);
+
+            // 선택한 No를 가진 MoneyFLow의 index
+            int updateIndex = ofIndex((ArrayList) moneyFlowList, updateMoneyFlow);
+
+            if (updateIndex == -1) {
                 System.out.println("error accured...");
             }
-
-            if (updateMF == null) {
+            if (updateMoneyFlow == null) {
                 System.out.println("해당 번호의 거래 내역이 없습니다.");
                 continue;
             }
@@ -96,8 +99,9 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
             // -> 3번 주석 답변처럼, 생성자를 사용해 아예 새로운 객체를 생성하는 방식을 사용할
             // 예정이라 삭제 및 새로 만들기 개념이 될 것 같습니다!
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            Calendar calendar = PromptMoneyFlow.inputCalendar(updateMF.getCalendar());
+            Calendar calendar = PromptMoneyFlow.inputCalendar(updateMoneyFlow.getCalendar());
             if (calendar == null) break;
+            else newMoneyFlow.setTransactionDate(calendar);
 
 
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -106,20 +110,30 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
             //
             //  -> 깰꼼하게 바꿔놓을게요! ㅋㅋㅋㅋ
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            String inputIncomeOrSpendMessage = "수입 or 지출 변경 (" + updateMF.getIncomeOrSpend() + ") >>";
+            String inputIncomeOrSpendMessage = "수입 or 지출 변경 (" + updateMoneyFlow.getIncomeOrSpend() + ") >>";
             String incomeOrSpend = PromptMoneyFlow.inputIncomeOrSpend(inputIncomeOrSpendMessage);
+            newMoneyFlow.setIncomeOrSpend(incomeOrSpend);
 
-            String inputAmountMessage = "금액 변경 (" + updateMF.getAmount() + ") >>";
-            int amount = PromptMoneyFlow.inputAmount(inputAmountMessage);
+            String inputAmountMessage = "금액 변경 (" + updateMoneyFlow.getAmount() + ") >>";
+            int amount = PromptMoneyFlow.inputAmount(inputAmountMessage, newMoneyFlow.getIncomeOrSpend());
+            newMoneyFlow.setAmount(amount);
 
-            String inputPaymentMethodMessage = "결제 수단 변경 (" + updateMF.getPaymentMethod().toString() + ") >>";
-            String paymentMethod = PromptMoneyFlow.inputPaymentMethod(inputPaymentMethodMessage);
+            if (newMoneyFlow.getIncomeOrSpend().equals("지출")) {
+                String inputPaymentMethodMessage = "결제 수단 변경 (" + updateMoneyFlow.getPaymentMethod().toString() + ") >>";
+                String paymentMethod = PromptMoneyFlow.inputPaymentMethod(inputPaymentMethodMessage);
+                newMoneyFlow.setPaymentMethod(paymentMethod);
+            }
+            else if (newMoneyFlow.getIncomeOrSpend().equals("수입")){
+                newMoneyFlow.setPaymentMethod("        ");
+            }
 
-            String inputCategoryMessage = "항목 변경 (" + updateMF.getCategory() + ") >>";
-            String category = PromptMoneyFlow.inputCategory(updateMF.getIncomeOrSpend(), inputCategoryMessage);
+            String inputCategoryMessage = "항목 변경 (" + updateMoneyFlow.getCategory() + ") >>";
+            String category = PromptMoneyFlow.inputCategory(newMoneyFlow.getIncomeOrSpend(), inputCategoryMessage);
+            newMoneyFlow.setCategory(category);
 
-            String inputDescriptionMessage = "설명 변경 (" + updateMF.getDescription() + ") >>";
+            String inputDescriptionMessage = "설명 변경 (" + updateMoneyFlow.getDescription() + ") >>";
             String description = PromptMoneyFlow.inputDescription(inputDescriptionMessage);
+            newMoneyFlow.setDescription(description);
 
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // 읽은 후 삭제 혹은 답변 부탁드릴게요!
@@ -133,12 +147,10 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
             //  2. 생성자를 사용해 삭제와 새로 만들기를 코드 내에서 진행 (기존 방식과 크게 달라질 점이 없음)
             //  이런 문제가 예상되어서 그런 문제가 상관 없다면 바꿀 수 있습니다.
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            MoneyFlow updatedMoneyFlow = new MoneyFlow(calendar, amount,
-                incomeOrSpend, category, description, paymentMethod);
 
-            updatedMoneyFlow.setNo(((MoneyFlow)moneyFlowList.get(updateIndex)).getNo());
+            newMoneyFlow.setNo(((MoneyFlow)moneyFlowList.get(updateIndex)).getNo());
 
-            moneyFlowList.set(updateIndex, updatedMoneyFlow);
+            moneyFlowList.set(updateIndex, newMoneyFlow);
 
             moneyFlowList = sortNoByDate((ArrayList) moneyFlowList);
             return;

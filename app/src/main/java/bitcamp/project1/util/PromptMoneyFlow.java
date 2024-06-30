@@ -196,10 +196,11 @@ public class PromptMoneyFlow extends Prompt{
         return input(message);
     }
 
-    public static int inputAmount(String message) {
+    public static int inputAmount(String message, String incomeOrSpend) {
         while (true) {
             try {
-                return inputInt(message);
+                if(incomeOrSpend.equals("수입")) return inputInt(message);
+                else if(incomeOrSpend.equals("지출")) return -(inputInt(message));
             } catch (NumberFormatException e) {
                 System.out.println("올바른 금액을 입력하세요.");
             }
@@ -277,7 +278,7 @@ public class PromptMoneyFlow extends Prompt{
 
 
     public static String inputPaymentMethod(String message) {
-        String[] paymentMethods = {"카드", "현금"};
+        String[] paymentMethods = {"  카드  ", "  현금  "};
 
         while (true) {
             try {
