@@ -20,7 +20,8 @@ public class App {
         String command;
         while (true) {
             try {
-                command = Prompt.input("메인>");
+                System.out.println();
+                command = Prompt.input("메인 >>");
                 if (command.equals("menu")) {
                     printMenu();
                 } else {
