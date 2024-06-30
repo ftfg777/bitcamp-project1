@@ -151,7 +151,11 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
             if (amount == 0) {
                 break;
             } else {
-                newMoneyFlow.setAmount(amount);
+                if (newMoneyFlow.getIncomeOrSpend().equals("수입")) {
+                    newMoneyFlow.setAmount(amount);
+                } else {
+                    newMoneyFlow.setAmount(-amount);
+                }
             }
 
             // paymentMethod 변경

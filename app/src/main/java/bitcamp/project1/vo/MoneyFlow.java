@@ -101,11 +101,8 @@ public class MoneyFlow {
     }
 
     public int getAmount() {
-        if (amount < 0) {
-            return -amount;
-        } else {
-            return amount;
-        }
+        return amount;
+        
     }
 
     public void setAmount(int amount) {
