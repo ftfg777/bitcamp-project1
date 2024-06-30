@@ -18,7 +18,6 @@ public class MoneyFlow {
     private Object paymentMethod;                // 결제수단
 
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -71,6 +70,10 @@ public class MoneyFlow {
         return ++seqNo;
     }
 
+    public static void decreaseSeqNo() {
+        seqNo -= 1;
+    }
+
     public int getNo() {
         return no;
     }
@@ -99,6 +102,7 @@ public class MoneyFlow {
 
     public int getAmount() {
         return amount;
+        
     }
 
     public void setAmount(int amount) {

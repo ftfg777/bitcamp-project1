@@ -8,15 +8,15 @@ import bitcamp.project1.util.PromptMoneyFlow;
 import bitcamp.project1.vo.Category.DepositCategory;
 import bitcamp.project1.vo.Category.WithdrawCategory;
 import bitcamp.project1.vo.MoneyFlow;
-import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 
 public class MoneyFlowCommand implements MoneyFlowInterface {
 
-    List<MoneyFlow> moneyFlowList = new ArrayList<>();
+    static List<MoneyFlow> moneyFlowList = new ArrayList<>();
 
     @Override
     public void executeCreate() {
@@ -45,7 +45,10 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                 moneyFlowList.add(addMoneyFlowWithId(moneyFlow)); // 시퀀스 증가 및 리스트에 추가
 
                 moneyFlowList = sortNoByDate(moneyFlowList);
-                System.out.println("작성 완료!");
+
+                System.out.println("");
+                System.out.println("[System] : 작성 완료!");
+                System.out.println("");
 
                 return;
             } catch (NumberFormatException e) {
@@ -54,6 +57,49 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
         }
         System.out.println("생성이 취소되었습니다.");
 
+    }
+
+    @Override
+    public void executeRead() {
+        String[] readMenus = {"전체", "입금", "출금", "기간"};
+        String command;
+
+        Print.printMenuWithExit("조회", readMenus);
+
+        while (true) {
+            try {
+                command = Prompt.input("메인/조회 >>");
+                System.out.println("");
+                if (command.equals("menu")) {
+                    Print.printMenuWithExit("조회", readMenus);
+                } else {
+                    int menuNo = Integer.parseInt(command);
+                    if (menuNo == 0) {
+                        break;
+                    } else {
+                        String menuTitle = getMenuTitle(menuNo, readMenus); // 설명하는 변수
+                        if (menuTitle == null) {
+                            System.out.println("유효한 메뉴 번호가 아닙니다.");
+                        } else {
+                            ReadCommand.processReadMenu(menuTitle);
+                            return;
+                        }
+                    }
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("숫자로 메뉴 번호를 입력하세요.");
+            }
+        }
+        System.out.println("조회가 종료되었습니다.");
+    }
+
+
+    boolean isValidateMenu(int menuNo, String[] menus) {
+        return menuNo >= 1 && menuNo <= menus.length;
+    }
+
+    String getMenuTitle(int menuNo, String[] menus) {
+        return isValidateMenu(menuNo, menus) ? menus[menuNo - 1] : null;
     }
 
     @Override
@@ -67,21 +113,20 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
             if (no == 0) {
                 break;
             }
+            System.out.println("");
 
             // 선택한 No의 MoneyFlow 선택
             MoneyFlow updateMoneyFlow = getByNo(no);
 
             // 선택한 No를 가진 MoneyFLow의 index
-            int updateIndex = ofIndex(moneyFlowList, updateMoneyFlow);
+            int updateIndex = ofIndex(updateMoneyFlow);
 
-            if (updateIndex == -1) {
-                System.out.println("error accured...");
-            }
             if (updateMoneyFlow == null) {
                 System.out.println("해당 번호의 거래 내역이 없습니다.");
                 continue;
             }
 
+            // Calendar 변경
             Calendar calendar = PromptMoneyFlow.inputCalendar(updateMoneyFlow.getCalendar());
             if (calendar == null) {
                 break;
@@ -89,104 +134,118 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                 newMoneyFlow.setTransactionDate(calendar);
             }
 
+            // incomeOrSpend 변경
             String inputIncomeOrSpendMessage =
-                "수입 or 지출 변경 (" + updateMoneyFlow.getIncomeOrSpend() + ") >>";
+                "거래 유형 변경 (" + updateMoneyFlow.getIncomeOrSpend() + ") >>";
             String incomeOrSpend = PromptMoneyFlow.inputIncomeOrSpend(inputIncomeOrSpendMessage);
-            newMoneyFlow.setIncomeOrSpend(incomeOrSpend);
+            if (inputIncomeOrSpendMessage.equals("종료")) {
+                break;
+            } else {
+                newMoneyFlow.setIncomeOrSpend(incomeOrSpend);
+            }
 
+            // amount 변경
             String inputAmountMessage = "금액 변경 (" + updateMoneyFlow.getAmount() + ") >>";
             int amount = PromptMoneyFlow.inputAmount(inputAmountMessage,
                 newMoneyFlow.getIncomeOrSpend());
-            newMoneyFlow.setAmount(amount);
+            if (amount == 0) {
+                break;
+            } else {
+                if (newMoneyFlow.getIncomeOrSpend().equals("수입")) {
+                    newMoneyFlow.setAmount(amount);
+                } else {
+                    newMoneyFlow.setAmount(-amount);
+                }
+            }
 
+            // paymentMethod 변경
             if (newMoneyFlow.getIncomeOrSpend().equals("지출")) {
                 String inputPaymentMethodMessage =
                     "결제 수단 변경 (" + updateMoneyFlow.getPaymentMethod().toString() + ") >>";
                 String paymentMethod = PromptMoneyFlow.inputPaymentMethod(
                     inputPaymentMethodMessage);
-                newMoneyFlow.setPaymentMethod(paymentMethod);
+                if (paymentMethod.equals("종료")) {
+                    break;
+                } else {
+                    newMoneyFlow.setPaymentMethod(paymentMethod);
+                }
             } else if (newMoneyFlow.getIncomeOrSpend().equals("수입")) {
                 newMoneyFlow.setPaymentMethod("        ");
             }
 
-            String inputCategoryMessage = "항목 변경 (" + updateMoneyFlow.getCategory() + ") >>";
+            // category 변경
+            String inputCategoryMessage = "카테고리 변경 (" + updateMoneyFlow.getCategory() + ") >>";
             String category = PromptMoneyFlow.inputCategory(newMoneyFlow.getIncomeOrSpend(),
                 inputCategoryMessage);
-            newMoneyFlow.setCategory(category);
+            if (category.equals("종료")) {
+                break;
+            } else {
+                newMoneyFlow.setCategory(category);
+            }
 
+            // decription 변경
             String inputDescriptionMessage = "설명 변경 (" + updateMoneyFlow.getDescription() + ") >>";
             String description = PromptMoneyFlow.inputDescription(inputDescriptionMessage);
             newMoneyFlow.setDescription(description);
 
+            // no 변경
             newMoneyFlow.setNo(moneyFlowList.get(updateIndex).getNo());
 
+            // 기존 MoneyFlow 위치에 변경된 MoneyFlow 삽입
             moneyFlowList.set(updateIndex, newMoneyFlow);
 
+            // 변경 후 재정렬
             moneyFlowList = sortNoByDate(moneyFlowList);
+
+            System.out.println("");
+            System.out.println("[System] : 수정 완료!");
+            System.out.println("");
             return;
         }
         System.out.println("수정이 취소되었습니다.");
-    }
-
-    private int ofIndex(List<MoneyFlow> arrayList, MoneyFlow moneyFlow) {
-        for (int i = 0; i < arrayList.size(); i++) {
-            if (moneyFlow.equals(arrayList.get(i))) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-
-    public List<MoneyFlow> sortNoByDate(List<MoneyFlow> moneyFlowList) {
-        for (int i = 0; i < moneyFlowList.size(); i++) {
-            for (int j = i + 1; j < moneyFlowList.size(); j++) {
-                MoneyFlow moneyFlowA = moneyFlowList.get(i);
-                MoneyFlow moneyFlowB = moneyFlowList.get(j);
-                if (moneyFlowA.getCalendar().after(moneyFlowB.getCalendar())) {
-                    System.out.println("디버깅용");
-                    int tempNo = moneyFlowA.getNo();
-                    moneyFlowA.setNo(moneyFlowB.getNo());
-                    moneyFlowB.setNo(tempNo);
-                    System.out.println(moneyFlowA);
-                    System.out.println(moneyFlowB);
-                    Collections.swap(moneyFlowList, i, j);
-                    System.out.println(moneyFlowA);
-                    System.out.println(moneyFlowB);
-                }
-            }
-        }
-
-        return moneyFlowList;
-    }
-
-
-    @Override
-    public void executeRead() {
-        Print.printAccountBook(moneyFlowList);
     }
 
     @Override
     public void executeDelete() {
         Print.printAccountBook(moneyFlowList);
 
-        int index = Prompt.inputInt("삭제 할 기록의 index : ");
+        while (true) {
+            try {
+                int deleteNo = Prompt.inputInt("삭제 할 기록의 No [0 = 종료] >>");
+                if (deleteNo == 0) {
+                    break;
+                } else if (0 < deleteNo && deleteNo < moneyFlowList.size() + 1) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(2101, 12, 31);
 
-        moneyFlowList.remove(index - 1);
+                    getByNo(deleteNo).setTransactionDate(calendar);
+                    sortNoByDate(moneyFlowList);
+
+                    moneyFlowList.remove(getByNo(moneyFlowList.size()));
+                    MoneyFlow.decreaseSeqNo();
+
+                    if (!moneyFlowList.isEmpty()) {
+                        sortNoByDate(moneyFlowList);
+                    }
+                    if (moneyFlowList.size() == 1) {
+                        moneyFlowList.getFirst().setNo(1);
+                    }
+
+                    return;
+                } else {
+                    System.out.println("올바르지 않은 No 입니다.");
+                }
+
+            } catch (NumberFormatException e) {
+                System.out.println("숫자로 입력해주세요.");
+            }
+        }
+        System.out.println("삭제가 종료 되었습니다.");
     }
 
     private MoneyFlow addMoneyFlowWithId(MoneyFlow moneyFlow) {
         moneyFlow.setNo(MoneyFlow.getNextSeqNo());
         return moneyFlow;
-    }
-
-    public MoneyFlow getByNo(int no) {
-        for (int i = 0; i < moneyFlowList.size(); i++) {
-            if (moneyFlowList.get(i).getNo() == no) {
-                return moneyFlowList.get(i);
-            }
-        }
-        return null;
     }
 
     public int processTransactionType(MoneyFlow moneyFlow) {
@@ -201,26 +260,14 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
 
                 // 수입 로직
                 if (moneyFlow.getIncomeOrSpend().equals("수입")) {
+                    System.out.println("");
+                    moneyFlow.setAmount(
+                        moneyFlow.getAmount() + PromptMoneyFlow.inputDepositAmount("수입액 입력 >>"));
 
-                    int depositAmount = Prompt.inputInt("수입액 입력 >>");
-                    if (depositAmount <= 0) {
-                        System.out.println("0보다 큰 금액을 입력해 주세요.");
-                        continue;
-                    }
+                    DepositCategory category = DepositCategory.values()[0];
+                    Print.printCategory(category);
 
-                    moneyFlow.setAmount(moneyFlow.getAmount() + depositAmount);
-
-                    Print.printCategory(DepositCategory.values()[0]);
-                    int categoryNo = 0;
-                    while (true) {
-                        categoryNo = Prompt.inputInt("카테고리 선택 >>");
-                        if (!PromptMoneyFlow.isInRange(categoryNo, 0,
-                            DepositCategory.values().length)) {
-                            System.out.println("유효한 카테고리 번호를 입력해 주세요.");
-                            continue;
-                        }
-                        break;
-                    }
+                    int categoryNo = PromptMoneyFlow.inputCategory(category, "카테고리 선택 >>");
 
                     moneyFlow.setCategory(DepositCategory.values()[categoryNo - 1].getName());
 
@@ -228,25 +275,15 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
 
                 // 지출 로직
                 else if (moneyFlow.getIncomeOrSpend().equals("지출")) {
+                    System.out.println("");
+                    moneyFlow.setAmount(
+                        moneyFlow.getAmount() - PromptMoneyFlow.inputAmountSpent("지출액 입력 >>"));
 
-                    int amountSpent = Prompt.inputInt("지출액 입력:");
-                    if (amountSpent <= 0) {
-                        System.out.println("0보다 큰 금액을 입력해 주세요.");
-                    }
+                    WithdrawCategory category = WithdrawCategory.values()[0];
+                    Print.printCategory(category);
+                    int categoryNo = PromptMoneyFlow.inputCategory(category, "카테고리 선택 >>");
 
-                    moneyFlow.setAmount(moneyFlow.getAmount() - amountSpent);
-
-                    Print.printCategory(WithdrawCategory.values()[0]);
-                    int categoryNo = 0;
-                    while (true) {
-                        categoryNo = Prompt.inputInt("카테고리 선택:");
-                        if (!PromptMoneyFlow.isInRange(categoryNo, 0,
-                            WithdrawCategory.values().length)) {
-                            System.out.println("유효한 카테고리 번호를 입력해 주세요.");
-                            continue;
-                        }
-                        break;
-                    }
+                    System.out.println("");
                     moneyFlow.setCategory(WithdrawCategory.values()[categoryNo - 1].getName());
 
                 }
@@ -257,10 +294,41 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                 System.out.println("유효한 값이 아닙니다.");
             }
         }
-
     }
 
+    public List<MoneyFlow> sortNoByDate(List<MoneyFlow> moneyFlowList) {
+        for (int i = 0; i < moneyFlowList.size(); i++) {
+            for (int j = i + 1; j < moneyFlowList.size(); j++) {
+                MoneyFlow moneyFlowA = moneyFlowList.get(i);
+                MoneyFlow moneyFlowB = moneyFlowList.get(j);
+                if (moneyFlowA.getCalendar().after(moneyFlowB.getCalendar())) {
+                    int tempNo = moneyFlowA.getNo();
+                    moneyFlowA.setNo(moneyFlowB.getNo());
+                    moneyFlowB.setNo(tempNo);
+                    Collections.swap(moneyFlowList, i, j);
+                }
+            }
+        }
+        return moneyFlowList;
+    }
 
+    public MoneyFlow getByNo(int no) {
+        for (int i = 0; i < moneyFlowList.size(); i++) {
+            if (moneyFlowList.get(i).getNo() == no) {
+                return moneyFlowList.get(i);
+            }
+        }
+        return null;
+    }
+
+    private int ofIndex(MoneyFlow moneyFlow) {
+        for (int i = 0; i < moneyFlowList.size(); i++) {
+            if (moneyFlow.equals(moneyFlowList.get(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }
 
 

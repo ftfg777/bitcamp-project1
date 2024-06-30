@@ -1,6 +1,7 @@
 package bitcamp.project1;
 
 import bitcamp.project1.command.MoneyFlowCommand;
+import bitcamp.project1.util.Print;
 import bitcamp.project1.util.Prompt;
 
 public class App {
@@ -15,14 +16,16 @@ public class App {
 
 
     void execute() {
-        printMenu();
+        Print.printTitleShort();
+        Print.printMenu("메인 메뉴", menus);
 
         String command;
         while (true) {
             try {
-                command = Prompt.input("메인>");
+                command = Prompt.input("메인 >>");
+                System.out.println("");
                 if (command.equals("menu")) {
-                    printMenu();
+                    Print.printMenu("메인 메뉴", menus);
                 } else {
                     int menuNo = Integer.parseInt(command);
                     String menuTitle = getMenuTitle(menuNo, menus); // 설명하는 변수
@@ -43,23 +46,6 @@ public class App {
         Prompt.close();
 
     }
-
-
-    private void printMenu() {
-        for (int i = 0; i < menus.length; i++) {
-            String menu = menus[i];
-            System.out.printf("%d. %s\n", i + 1, menu);
-        }
-    }
-
-    boolean isValidateMenu(int menuNo, String[] menus) {
-        return menuNo >= 1 && menuNo <= menus.length;
-    }
-
-    String getMenuTitle(int menuNo, String[] menus) {
-        return isValidateMenu(menuNo, menus) ? menus[menuNo - 1] : null;
-    }
-
 
     void processMenu(String menuTitle) {
         try {
@@ -83,6 +69,14 @@ public class App {
             System.out.println("숫자로 메뉴 번호를 입력하세요.");
         }
 
+    }
+
+    boolean isValidateMenu(int menuNo, String[] menus) {
+        return menuNo >= 1 && menuNo <= menus.length;
+    }
+
+    String getMenuTitle(int menuNo, String[] menus) {
+        return isValidateMenu(menuNo, menus) ? menus[menuNo - 1] : null;
     }
 
 
