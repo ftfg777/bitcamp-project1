@@ -11,8 +11,8 @@ public class Category {
         private final String name;
 
         // 생성자
-        DepositCategory(String koreanName) {
-            this.name = koreanName;
+        DepositCategory(String name) {
+            this.name = name;
         }
 
         // 문자열 값을 반환하는 메서드

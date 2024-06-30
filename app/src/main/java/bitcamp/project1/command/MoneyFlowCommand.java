@@ -224,7 +224,6 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
 
                     moneyFlow.setCategory(DepositCategory.values()[categoryNo - 1].getName());
 
-                    moneyFlow.setPaymentMethod("        ");
                 }
 
                 // 지출 로직
@@ -250,8 +249,9 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                     }
                     moneyFlow.setCategory(WithdrawCategory.values()[categoryNo - 1].getName());
 
-                    moneyFlow.setPaymentMethod(PromptMoneyFlow.inputPaymentMethod("결제 수단 >>"));
                 }
+                moneyFlow.setPaymentMethod(PromptMoneyFlow.inputPaymentMethod("결제 수단 선택 >>"));
+
                 return 1;
             } catch (NumberFormatException e) {
                 System.out.println("유효한 값이 아닙니다.");

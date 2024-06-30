@@ -4,10 +4,12 @@ import bitcamp.project1.vo.Category.DepositCategory;
 import bitcamp.project1.vo.Category.WithdrawCategory;
 import bitcamp.project1.vo.MoneyFlow;
 import bitcamp.project1.util.Print;
+import bitcamp.project1.vo.PaymentMethod;
+import bitcamp.project1.vo.PaymentMethod.PayMethod;
 import java.time.LocalDate;
 import java.util.Calendar;
 
-public class PromptMoneyFlow extends Prompt{
+public class PromptMoneyFlow extends Prompt {
 
     // 추가된 메서드 (240629 by 동인) 컨펌 후 주석 제거
     public static Calendar inputCalendar(Calendar defaultCalendar) {
@@ -18,9 +20,9 @@ public class PromptMoneyFlow extends Prompt{
         int defaultMonth = defaultCalendar.get(Calendar.MONTH);
         int defaultDay = defaultCalendar.get(Calendar.DATE);
 
-        String defaultDate = defaultYear + "-" + (defaultMonth+1) + "-" + defaultDay;
+        String defaultDate = defaultYear + "-" + (defaultMonth + 1) + "-" + defaultDay;
 
-        while(true) {
+        while (true) {
             System.out.println("날짜 입력 [0 = 종료]");
             System.out.println("1. 자동 입력 (" + defaultDate + ")");
             System.out.println("2. 수동 입력");
@@ -35,14 +37,17 @@ public class PromptMoneyFlow extends Prompt{
                     String inputYearMessage = "연도 입력(2000 ~ 2100, default = " + defaultYear + ")";
                     year = inputYearWithDefault(inputYearMessage, defaultYear);
 
-                    if (year == defaultYear){
-                        String inputMonthMessage = "월 입력(1 ~ 12, default =" + (defaultMonth+1) + ")";
+                    if (year == defaultYear) {
+                        String inputMonthMessage =
+                            "월 입력(1 ~ 12, default =" + (defaultMonth + 1) + ")";
                         month = inputMonthWithDefault(inputMonthMessage, defaultMonth);
 
                         if (month == defaultMonth) {
                             Calendar calendar = Print.printCalendar(year, month);
 
-                            String inputDayMessage = "일 입력 (1 ~ " + getMaxDay(calendar) + ", default =" + defaultDay + ")";
+                            String inputDayMessage =
+                                "일 입력 (1 ~ " + getMaxDay(calendar) + ", default =" + defaultDay
+                                    + ")";
                             inputDayWithDefault(inputDayMessage, defaultDay, calendar);
 
                             return calendar;
@@ -54,7 +59,7 @@ public class PromptMoneyFlow extends Prompt{
                             return calendar;
                         }
                     } else {
-                        String inputMonthMessage =  "월 입력(1 ~ 12)";
+                        String inputMonthMessage = "월 입력(1 ~ 12)";
                         month = inputMonthWithoutDefault(inputMonthMessage);
                         Calendar calendar = Print.printCalendar(year, month);
 
@@ -135,7 +140,7 @@ public class PromptMoneyFlow extends Prompt{
                     continue;
                 }
                 return year;
-            } catch (NumberFormatException e){
+            } catch (NumberFormatException e) {
                 System.out.println("숫자로 입력해 주세요.");
             }
         }
@@ -199,8 +204,11 @@ public class PromptMoneyFlow extends Prompt{
     public static int inputAmount(String message, String incomeOrSpend) {
         while (true) {
             try {
-                if(incomeOrSpend.equals("수입")) return inputInt(message);
-                else if(incomeOrSpend.equals("지출")) return -(inputInt(message));
+                if (incomeOrSpend.equals("수입")) {
+                    return inputInt(message);
+                } else if (incomeOrSpend.equals("지출")) {
+                    return -(inputInt(message));
+                }
             } catch (NumberFormatException e) {
                 System.out.println("올바른 금액을 입력하세요.");
             }
@@ -278,7 +286,7 @@ public class PromptMoneyFlow extends Prompt{
 
 
     public static String inputPaymentMethod(String message) {
-        String[] paymentMethods = {"  카드  ", "  현금  "};
+        String[] paymentMethods = PayMethod.toArray();
 
         while (true) {
             try {
@@ -288,7 +296,7 @@ public class PromptMoneyFlow extends Prompt{
                 int inputPaymentMethod = inputInt(message);
 
                 if (0 < inputPaymentMethod && inputPaymentMethod < paymentMethods.length + 1) {
-                    return paymentMethods[inputPaymentMethod-1];
+                    return paymentMethods[inputPaymentMethod - 1];
                 } else {
                     System.out.println("올바른 항목을 선택하세요. ");
                 }
@@ -309,7 +317,7 @@ public class PromptMoneyFlow extends Prompt{
         return day >= 1 && day <= maxDay;
     }
 
-    public static int getMaxDay(Calendar calendar){
+    public static int getMaxDay(Calendar calendar) {
         return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
     }
 }
