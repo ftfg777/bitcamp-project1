@@ -53,7 +53,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                 moneyFlowList = sortNoByDate((ArrayList) moneyFlowList);
                 System.out.println("작성 완료!");
 
-                break;
+                return;
             } catch (NumberFormatException e) {
                 System.out.println("유효한 값이 아닙니다.");
             }
@@ -136,6 +136,8 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
             MoneyFlow updatedMoneyFlow = new MoneyFlow(calendar, amount,
                 incomeOrSpend, category, description, paymentMethod);
 
+            updatedMoneyFlow.setNo(((MoneyFlow)moneyFlowList.get(updateIndex)).getNo());
+
             moneyFlowList.set(updateIndex, updatedMoneyFlow);
 
             moneyFlowList = sortNoByDate((ArrayList) moneyFlowList);
@@ -158,11 +160,16 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
             for (int j = i + 1; j < moneyFlowList.size(); j++) {
                 MoneyFlow moneyFlowA = (MoneyFlow) moneyFlowList.get(i);
                 MoneyFlow moneyFlowB = (MoneyFlow) moneyFlowList.get(j);
-                if (moneyFlowA.getCalendar().after(moneyFlowB)) {
+                if (moneyFlowA.getCalendar().after(moneyFlowB.getCalendar())) {
+                    System.out.println("디버깅용");
                     int tempNo = moneyFlowA.getNo();
                     moneyFlowA.setNo(moneyFlowB.getNo());
                     moneyFlowB.setNo(tempNo);
+                    System.out.println(moneyFlowA);
+                    System.out.println(moneyFlowB);
                     Collections.swap(moneyFlowList, i, j);
+                    System.out.println(moneyFlowA);
+                    System.out.println(moneyFlowB);
                 }
             }
         }
@@ -208,7 +215,9 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                 // 값을 받은 뒤에 set 했습니다.
                 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 String incomeOrSpend = PromptMoneyFlow.inputIncomeOrSpend("거래 유형 선택 >>");
-                moneyFlow.setIncomeOrSpend(incomeOrSpend);
+                if (incomeOrSpend.equals("종료")) return 0;
+                else moneyFlow.setIncomeOrSpend(incomeOrSpend);
+
 
                 // 수입 로직
                 if (moneyFlow.getIncomeOrSpend().equals("수입")) {
