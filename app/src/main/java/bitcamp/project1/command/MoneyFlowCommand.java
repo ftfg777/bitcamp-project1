@@ -262,13 +262,17 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                 if (moneyFlow.getIncomeOrSpend().equals("수입")) {
                     System.out.println("");
                     moneyFlow.setAmount(
-                        moneyFlow.getAmount() + PromptMoneyFlow.inputDepositAmount("수입액 입력 >>"));
+                        moneyFlow.getAmount() + PromptMoneyFlow.inputAmount("수입액 입력 >>"));
 
                     DepositCategory category = DepositCategory.values()[0];
                     Print.printCategory(category);
 
                     int categoryNo = PromptMoneyFlow.inputCategory(category, "카테고리 선택 >>");
 
+                    System.out.println("");
+                    if (categoryNo == 0) {
+                        return 0;
+                    }
                     moneyFlow.setCategory(DepositCategory.values()[categoryNo - 1].getName());
 
                 }
@@ -277,17 +281,25 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                 else if (moneyFlow.getIncomeOrSpend().equals("지출")) {
                     System.out.println("");
                     moneyFlow.setAmount(
-                        moneyFlow.getAmount() - PromptMoneyFlow.inputAmountSpent("지출액 입력 >>"));
+                        moneyFlow.getAmount() - PromptMoneyFlow.inputAmount("지출액 입력 >>"));
 
                     WithdrawCategory category = WithdrawCategory.values()[0];
                     Print.printCategory(category);
                     int categoryNo = PromptMoneyFlow.inputCategory(category, "카테고리 선택 >>");
 
                     System.out.println("");
+                    if (categoryNo == 0) {
+                        return 0;
+                    }
                     moneyFlow.setCategory(WithdrawCategory.values()[categoryNo - 1].getName());
 
                 }
-                moneyFlow.setPaymentMethod(PromptMoneyFlow.inputPaymentMethod("결제 수단 선택 >>"));
+                String paymentMethod = PromptMoneyFlow.inputPaymentMethod("결제 수단 선택 >>");
+
+                if (paymentMethod.equals("종료")) {
+                    return 0;
+                }
+                moneyFlow.setPaymentMethod(paymentMethod);
 
                 return 1;
             } catch (NumberFormatException e) {

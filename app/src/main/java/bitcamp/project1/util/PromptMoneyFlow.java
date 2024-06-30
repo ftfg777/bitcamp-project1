@@ -304,7 +304,6 @@ public class PromptMoneyFlow extends Prompt {
     public static String inputPaymentMethod(String message) {
         System.out.println("------<< 결제 수단 [0 : 종료] >>------");
         String[] paymentMethods = PayMethod.toArray();
-
         while (true) {
             try {
                 for (int i = 0; i < paymentMethods.length; i++) {
@@ -342,12 +341,12 @@ public class PromptMoneyFlow extends Prompt {
         return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
     }
 
-    public static int inputDepositAmount(String message) {
-        int depositAmount;
+    public static int inputAmount(String message) {
+        int amount;
         while (true) {
             try {
-                depositAmount = Prompt.inputInt(message);
-                if (depositAmount <= 0) {
+                amount = Prompt.inputInt(message);
+                if (amount <= 0) {
                     System.out.println("0보다 큰 금액을 입력해 주세요.");
                     continue;
                 }
@@ -356,24 +355,7 @@ public class PromptMoneyFlow extends Prompt {
                 System.out.println("유효한 값이 아닙니다.");
             }
         }
-        return depositAmount;
-    }
-
-    public static int inputAmountSpent(String message) {
-        int amountSpent;
-        while (true) {
-            try {
-                amountSpent = Prompt.inputInt(message);
-                if (amountSpent <= 0) {
-                    System.out.println("0보다 큰 금액을 입력해 주세요.");
-                    continue;
-                }
-                break;
-            } catch (NumberFormatException e) {
-                System.out.println("유효한 값이 아닙니다.");
-            }
-        }
-        return amountSpent;
+        return amount;
     }
 
     public static int inputCategory(Object category, String message) {
@@ -387,7 +369,12 @@ public class PromptMoneyFlow extends Prompt {
                         System.out.println("유효한 카테고리 번호를 입력해 주세요.");
                         continue;
                     }
+                    if (categoryNo == 0) {
+                        break;
+                    }
+                    return categoryNo;
                 }
+
                 if (category instanceof WithdrawCategory) {
                     categoryNo = Prompt.inputInt(message);
                     if (!PromptMoneyFlow.isInRange(categoryNo, -1,
@@ -395,12 +382,11 @@ public class PromptMoneyFlow extends Prompt {
                         System.out.println("유효한 카테고리 번호를 입력해 주세요.");
                         continue;
                     }
+                    if (categoryNo == 0) {
+                        break;
+                    }
+                    return categoryNo;
                 }
-                if (categoryNo == 0) {
-                    return 0;
-                }
-                break;
-
             } catch (NumberFormatException e) {
                 System.out.println("유효한 값이 아닙니다.");
             }
