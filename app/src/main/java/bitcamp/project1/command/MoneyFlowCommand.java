@@ -95,14 +95,6 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                 continue;
             }
 
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            // 읽은 후 삭제 혹은 답변 부탁드릴게요!
-            // (1) 직접적인 날짜 수정은 막고 수정을 하고 싶으면 삭제하거나 새로 만드는 걸로 하는 게
-            // 어떨까 싶습니다!
-            //
-            // -> 3번 주석 답변처럼, 생성자를 사용해 아예 새로운 객체를 생성하는 방식을 사용할
-            // 예정이라 삭제 및 새로 만들기 개념이 될 것 같습니다!
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             Calendar calendar = PromptMoneyFlow.inputCalendar(updateMF.getCalendar());
             if (calendar == null) {
                 break;
@@ -126,18 +118,6 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
             String inputDescriptionMessage = "설명 변경 (" + updateMF.getDescription() + ") >>";
             String description = PromptMoneyFlow.inputDescription(inputDescriptionMessage);
 
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            // 읽은 후 삭제 혹은 답변 부탁드릴게요!
-            // (3) 생성자로 수정을 하면 기존 객체가 아닌 힙영역에 새롭게 생성되는 객체로 하시려는
-            // 의도가 맞는지 궁금합니다~!
-            //
-            //  -> 넵 맞습니다. 그런 방식을 채택하고 있긴 했는데, 혹시나 setter로 수정하는 방식을
-            //  원하시면 바꿀 순 있습니다. 다만, 다른 입력은 setter로 변경하고
-            //  날짜 입력은 삭제 및 새로 만드는 방식을 채택하게 된다면 날짜 변경 시에는
-            //  1. 유저가 직접 삭제 후 새로 만들기 (no가 바뀌는 문제가 있음)
-            //  2. 생성자를 사용해 삭제와 새로 만들기를 코드 내에서 진행 (기존 방식과 크게 달라질 점이 없음)
-            //  이런 문제가 예상되어서 그런 문제가 상관 없다면 바꿀 수 있습니다.
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             MoneyFlow updatedMoneyFlow = new MoneyFlow(calendar, amount,
                 incomeOrSpend, category, description, paymentMethod);
 
@@ -158,6 +138,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
         return -1;
     }
 
+
     public ArrayList sortNoByDate(ArrayList moneyFlowList) {
         for (int i = 0; i < moneyFlowList.size(); i++) {
             for (int j = i + 1; j < moneyFlowList.size(); j++) {
@@ -171,7 +152,6 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                 }
             }
         }
-
         return moneyFlowList;
     }
 
@@ -220,6 +200,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
 
                     // ************************
                     // start of setting amount
+
                     int depositAmount = Prompt.inputInt("수입액 입력 >>");
                     if (depositAmount <= 0) {
                         System.out.println("0보다 큰 금액을 입력해 주세요.");
