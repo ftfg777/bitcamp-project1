@@ -44,7 +44,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                 // static seqNo 증가 후 리스트 추가
                 moneyFlowList.add(addMoneyFlowWithId(moneyFlow)); // 시퀀스 증가 및 리스트에 추가
 
-                moneyFlowList = sortNoByDate((ArrayList) moneyFlowList);
+                moneyFlowList = sortNoByDate(moneyFlowList);
                 System.out.println("작성 완료!");
 
                 return;
@@ -72,7 +72,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
             MoneyFlow updateMoneyFlow = getByNo(no);
 
             // 선택한 No를 가진 MoneyFLow의 index
-            int updateIndex = ofIndex((ArrayList) moneyFlowList, updateMoneyFlow);
+            int updateIndex = ofIndex(moneyFlowList, updateMoneyFlow);
 
             if (updateIndex == -1) {
                 System.out.println("error accured...");
@@ -122,13 +122,13 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
 
             moneyFlowList.set(updateIndex, newMoneyFlow);
 
-            moneyFlowList = sortNoByDate((ArrayList) moneyFlowList);
+            moneyFlowList = sortNoByDate(moneyFlowList);
             return;
         }
         System.out.println("수정이 취소되었습니다.");
     }
 
-    private int ofIndex(ArrayList arrayList, MoneyFlow moneyFlow) {
+    private int ofIndex(List<MoneyFlow> arrayList, MoneyFlow moneyFlow) {
         for (int i = 0; i < arrayList.size(); i++) {
             if (moneyFlow.equals(arrayList.get(i))) {
                 return i;
@@ -138,11 +138,11 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
     }
 
 
-    public ArrayList sortNoByDate(ArrayList moneyFlowList) {
+    public List<MoneyFlow> sortNoByDate(List<MoneyFlow> moneyFlowList) {
         for (int i = 0; i < moneyFlowList.size(); i++) {
             for (int j = i + 1; j < moneyFlowList.size(); j++) {
-                MoneyFlow moneyFlowA = (MoneyFlow) moneyFlowList.get(i);
-                MoneyFlow moneyFlowB = (MoneyFlow) moneyFlowList.get(j);
+                MoneyFlow moneyFlowA = moneyFlowList.get(i);
+                MoneyFlow moneyFlowB = moneyFlowList.get(j);
                 if (moneyFlowA.getCalendar().after(moneyFlowB.getCalendar())) {
                     System.out.println("디버깅용");
                     int tempNo = moneyFlowA.getNo();
