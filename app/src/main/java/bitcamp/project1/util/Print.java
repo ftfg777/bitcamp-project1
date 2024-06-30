@@ -1,5 +1,6 @@
 package bitcamp.project1.util;
 
+import bitcamp.project1.App;
 import bitcamp.project1.vo.Category.DepositCategory;
 import bitcamp.project1.vo.Category.WithdrawCategory;
 import bitcamp.project1.vo.MoneyFlow;
@@ -63,9 +64,8 @@ public class Print {
     }
 
     public static void printAccountBook(List<MoneyFlow> moneyFlowList) {
-        String title = "-----reach to rich-----";
+        App.printTitle();
 
-        System.out.println(title);
         System.out.println(
             "No |   날짜   |     수입     |     지출     |     잔액     |   항목   | 결제방식 |     메모");
         System.out.println(

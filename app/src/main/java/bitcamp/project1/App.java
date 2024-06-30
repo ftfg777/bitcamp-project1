@@ -5,6 +5,8 @@ import bitcamp.project1.util.Prompt;
 
 public class App {
 
+    static String stars = "**********************************";
+    static String title = "**  쌈뽕 가계부: 재테크의 맛!  **";
     static String[] menus = new String[]{"작성", "조회", "수정", "삭제", "종료"};
 
     MoneyFlowCommand moneyFlowCommand = new MoneyFlowCommand();
@@ -13,15 +15,22 @@ public class App {
         new App().execute();
     }
 
+    public static void printTitle() {
+        System.out.println(stars);
+        System.out.println(title);
+        System.out.println(stars);
+    }
+
 
     void execute() {
+        printTitle();
         printMenu();
 
         String command;
         while (true) {
             try {
-                System.out.println();
                 command = Prompt.input("메인 >>");
+                System.out.println("");
                 if (command.equals("menu")) {
                     printMenu();
                 } else {
@@ -47,6 +56,7 @@ public class App {
 
 
     private void printMenu() {
+        System.out.println("--------<<  메인 메뉴  >>--------");
         for (int i = 0; i < menus.length; i++) {
             String menu = menus[i];
             System.out.printf("%d. %s\n", i + 1, menu);

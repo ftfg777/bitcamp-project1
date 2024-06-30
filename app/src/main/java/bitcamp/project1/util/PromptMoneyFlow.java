@@ -19,11 +19,10 @@ public class PromptMoneyFlow extends Prompt {
         String defaultDate = defaultYear + "-" + (defaultMonth + 1) + "-" + defaultDay;
 
         while (true) {
-            System.out.println("---<<날짜 입력 [0 = 종료]>>---");
+            System.out.println("---<< 날짜 입력 [0 = 종료] >>---");
             System.out.println("1. 자동 입력 (" + defaultDate + ")");
             System.out.println("2. 수동 입력");
             int selectInputMethod = inputInt("날짜 입력 방식 선택 >>");
-            // 한 줄 띄우기용
             System.out.println("");
 
             switch (selectInputMethod) {
