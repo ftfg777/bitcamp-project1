@@ -243,7 +243,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
         System.out.println("삭제가 종료 되었습니다.");
     }
 
-    private MoneyFlow addMoneyFlowWithId(MoneyFlow moneyFlow) {
+    public static MoneyFlow addMoneyFlowWithId(MoneyFlow moneyFlow) {
         moneyFlow.setNo(MoneyFlow.getNextSeqNo());
         return moneyFlow;
     }
@@ -308,7 +308,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
         }
     }
 
-    public List<MoneyFlow> sortNoByDate(List<MoneyFlow> moneyFlowList) {
+    public static List<MoneyFlow> sortNoByDate(List<MoneyFlow> moneyFlowList) {
         for (int i = 0; i < moneyFlowList.size(); i++) {
             for (int j = i + 1; j < moneyFlowList.size(); j++) {
                 MoneyFlow moneyFlowA = moneyFlowList.get(i);

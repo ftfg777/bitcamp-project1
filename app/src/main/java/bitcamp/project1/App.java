@@ -1,6 +1,7 @@
 package bitcamp.project1;
 
 import bitcamp.project1.command.MoneyFlowCommand;
+import bitcamp.project1.command.TestCommand;
 import bitcamp.project1.util.Print;
 import bitcamp.project1.util.Prompt;
 
@@ -26,6 +27,8 @@ public class App {
                 System.out.println("");
                 if (command.equals("menu")) {
                     Print.printMenu("메인 메뉴", menus);
+                } else if (command.equals("test")) {
+                    TestCommand.addListForTest();
                 } else {
                     int menuNo = Integer.parseInt(command);
                     String menuTitle = getMenuTitle(menuNo, menus); // 설명하는 변수
