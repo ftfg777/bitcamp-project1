@@ -59,7 +59,7 @@ public class TestCommand {
             if (incomeOrSpends[i] == "수입") {
                 category[i] = DepositCategory.values()[getRandomNumber(0, 2)].getName();
                 description[i] = descriptionForIncome[getRandomNumber(0, 2)];
-                paymentMethod[i] = "        ";
+                paymentMethod[i] = i % 3 == 1 ? "  현금  " : i % 3 == 2 ? "계좌이체" : "  기타  ";
             } else {
                 amounts[i] = -amounts[i];
                 category[i] = WithdrawCategory.values()[getRandomNumber(0, 8)].getName();

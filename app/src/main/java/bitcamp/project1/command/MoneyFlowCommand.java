@@ -264,6 +264,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                     moneyFlow.setAmount(
                         moneyFlow.getAmount() + PromptMoneyFlow.inputAmount("수입액 입력 >>"));
 
+                    System.out.println("");
                     DepositCategory category = DepositCategory.values()[0];
                     Print.printCategory(category);
 
@@ -282,7 +283,7 @@ public class MoneyFlowCommand implements MoneyFlowInterface {
                     System.out.println("");
                     moneyFlow.setAmount(
                         moneyFlow.getAmount() - PromptMoneyFlow.inputAmount("지출액 입력 >>"));
-
+                    System.out.println("");
                     WithdrawCategory category = WithdrawCategory.values()[0];
                     Print.printCategory(category);
                     int categoryNo = PromptMoneyFlow.inputCategory(category, "카테고리 선택 >>");

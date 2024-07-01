@@ -4,7 +4,9 @@ public class PaymentMethod {
 
     public enum PayMethod {
         CARD("  카드  "),
-        CASH("  현금  ");
+        CASH("  현금  "),
+        TRANSFER("계좌이체"),
+        OTHERS("  기타  ");
 
         private final String name;
 
